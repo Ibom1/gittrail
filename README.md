@@ -47,7 +47,6 @@ The report commands accept `-C <repo>`, `--json`, `--md`, and `--no-color`. Use 
 - **`git log`** gives you the underlying history and flexible filters. Gittrail adds a ready-to-read summary and a ranked list of changed files.
 - **tig** lets you browse history interactively in a terminal. Gittrail prints a report you can read, save, or consume as JSON.
 - **git-quick-stats** summarizes repository activity. Gittrail focuses on what changed in the code and follows an individual file across renames.
-
 - Most Git statistics tools rank contributors. Gittrail reports on the code only, with no author names or rankings.
 
 ## Quick start

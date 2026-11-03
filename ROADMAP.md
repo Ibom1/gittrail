@@ -29,6 +29,7 @@ Estimates are hands-on development hours for comparing milestone scope. Calendar
 - [x] Add Markdown reports and terminal color controls.
 - [x] Document examples and troubleshooting.
 - [x] Publish after CI passes.
+- [x] Add the single-command demo, shared sample repository, and CI demo check in v0.2.1.
 
 **Done when** tagged snapshots report the same added, removed, and renamed files in text, JSON, and Markdown, and dated fixtures verify overview counts and combined filters.
 

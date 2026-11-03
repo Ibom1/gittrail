@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## v0.2.1
 
 - `gittrail demo` shows Gittrail on a throwaway sample repository.
 - `examples/make_sample_repo.py` builds the sample in a folder you choose.
