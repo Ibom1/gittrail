@@ -16,3 +16,16 @@ jobs:
         with:
           python-version: ${{ matrix.python }}
       - run: python -m unittest -v
+      - name: Run the demo
+        run: python -m gittrail demo
+      - name: Add demo output to the job summary
+        if: matrix.python == '3.13'
+        shell: bash
+        run: |
+          set -e
+          {
+            echo '### gittrail demo'
+            echo '```'
+            python -m gittrail demo
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"

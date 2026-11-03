@@ -4,9 +4,18 @@
 
 Read a repository's git history and explain how the code got where it is: which commits changed what, which files change most, and the full timeline of a single file, renames included. Runs locally, needs only Python and git, and never changes your repository.
 
-![Terminal output showing three commits from the Git source repository](docs/demo.svg)
+![Terminal output showing monthly activity, busiest folders, and most changed files](docs/demo.svg)
 
-Demo captured against a checkout of the [Git source repository](https://github.com/git/git).
+Overview captured from the six-commit sample repository.
+
+## Try it in 30 seconds
+
+```sh
+git clone https://github.com/Ibom1/gittrail.git
+cd gittrail
+python -m gittrail demo          # builds a sample repo, shows the output, cleans up
+python -m gittrail demo --keep   # keeps the sample so you can try more commands
+```
 
 ## Who it's for
 
@@ -19,11 +28,11 @@ Developers who join a project, come back to old code, or review a branch and wan
 | `gittrail log [rev]` | Commits newest first, with files changed and lines added / removed, then a summary and the most-changed files |
 | `gittrail log --files` | The same, listing every file each commit touched (renames shown as `old -> new`) |
 | `gittrail file <path>` | Every commit that touched one file, oldest first, following renames, and every name it was known by |
-
 | `gittrail changes <from>..<to>` | Commit count and net file changes between two revisions, grouped by folder |
 | `gittrail overview` | Monthly activity, busiest folders, and most changed files |
+| `gittrail demo` | Run the CLI against a disposable sample repository |
 
-All commands accept `-C <repo>`, `--json`, `--md`, and `--no-color`. Use `NO_COLOR` to disable terminal color. On `log`, combine `-n`, `--since`, `--until`, and `-- <path>`. Use `overview --months N` to choose the monthly window.
+The report commands accept `-C <repo>`, `--json`, `--md`, and `--no-color`. Use `NO_COLOR` to disable terminal color. On `log`, combine `-n`, `--since`, `--until`, and `-- <path>`. Use `overview --months N` to choose the monthly window.
 
 ### Exit codes
 
@@ -38,6 +47,7 @@ All commands accept `-C <repo>`, `--json`, `--md`, and `--no-color`. Use `NO_COL
 - **`git log`** gives you the underlying history and flexible filters. Gittrail adds a ready-to-read summary and a ranked list of changed files.
 - **tig** lets you browse history interactively in a terminal. Gittrail prints a report you can read, save, or consume as JSON.
 - **git-quick-stats** summarizes repository activity. Gittrail focuses on what changed in the code and follows an individual file across renames.
+- Most Git statistics tools rank contributors. Gittrail reports on the code only, with no author names or rankings.
 
 ## Quick start
 
@@ -51,6 +61,8 @@ pip install -e .                     # or install the `gittrail` command
 gittrail file README.md
 gittrail log -C ../other-repo
 ```
+
+Build the sample in a folder of your choice with `python examples/make_sample_repo.py ./sample`.
 
 ## Examples
 
@@ -74,7 +86,7 @@ gittrail log -C ../other-repo
 
 ## Built with
 
-Python standard library only (`subprocess`, `argparse`, `dataclasses`, `json`). gittrail uses read-only Git commands and parses their output; it never writes to the repository. Tests use `unittest` and build throwaway git repos for each case:
+Python standard library only (`subprocess`, `argparse`, `dataclasses`, `json`). gittrail uses read-only Git commands and parses their output; it never writes to the repository being analyzed (see [`test_never_changes_the_repository`](tests/test_gittrail.py#L146)). Tests use `unittest` and build throwaway git repos for each case:
 
 ```bash
 python -m unittest
@@ -85,6 +97,8 @@ python -m unittest
 ```
 gittrail/git.py      runs git log and parses its output (commits, line counts, renames)
 gittrail/history.py  file timelines and log summaries
+gittrail/reports.py  revision comparisons and repository overviews
+gittrail/sample.py   shared sample repository builder
 gittrail/cli.py      the commands and their text / JSON output
 tests/               tests on throwaway repositories
 ```

@@ -2,20 +2,17 @@
 
 from __future__ import annotations
 
-import os
-import subprocess
 import tempfile
 from pathlib import Path
 
+from gittrail.sample import sample_git
+
 # Fixed identity and dates so tests do not depend on the machine's git config.
 ENV = {
-    **os.environ,
     "GIT_AUTHOR_NAME": "Test Author",
     "GIT_AUTHOR_EMAIL": "test@example.com",
     "GIT_COMMITTER_NAME": "Test Author",
     "GIT_COMMITTER_EMAIL": "test@example.com",
-    "GIT_CONFIG_GLOBAL": os.devnull,
-    "GIT_CONFIG_NOSYSTEM": "1",
 }
 
 
@@ -27,10 +24,8 @@ class Repo:
         self.git("init", "-q", "-b", "main")
 
     def git(self, *args: str) -> str:
-        return subprocess.run(
-            ["git", "-C", str(self.path), *args],
-            env=self._env(), check=True, capture_output=True, text=True,
-        ).stdout
+        env = self._env()
+        return sample_git(self.path, *args, date=env["GIT_AUTHOR_DATE"], identity=env)
 
     def _env(self) -> dict:
         date = f"2026-01-{self._day + 1:02d}T12:00:00+00:00"
