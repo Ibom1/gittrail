@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="880" height="303" viewBox="0 0 880 303">
+<rect width="880" height="303" rx="12" fill="#101a2c"/>
+<text x="24" y="33" xml:space="preserve" fill="#8ee6c4" font-family="monospace" font-size="16">$ gittrail log -C ./git -n 3</text>
+<text x="24" y="56" xml:space="preserve" fill="#edf3ff" font-family="monospace" font-size="16"></text>
+<text x="24" y="79" xml:space="preserve" fill="#edf3ff" font-family="monospace" font-size="16">750f5de  2026-11-03  The 14th batch</text>
+<text x="24" y="102" xml:space="preserve" fill="#edf3ff" font-family="monospace" font-size="16">         1 file, +14 -0</text>
+<text x="24" y="125" xml:space="preserve" fill="#edf3ff" font-family="monospace" font-size="16">e1bb515  2026-11-03  Merge branch &#x27;ss/t0081-test-path-is-file&#x27;</text>
+<text x="24" y="148" xml:space="preserve" fill="#edf3ff" font-family="monospace" font-size="16">         0 files, +0 -0</text>
+<text x="24" y="171" xml:space="preserve" fill="#edf3ff" font-family="monospace" font-size="16">90be138  2026-11-03  Merge branch &#x27;jc/advice-config-set-global&#x27;</text>
+<text x="24" y="194" xml:space="preserve" fill="#edf3ff" font-family="monospace" font-size="16">         0 files, +0 -0</text>
+<text x="24" y="217" xml:space="preserve" fill="#edf3ff" font-family="monospace" font-size="16"></text>
+<text x="24" y="240" xml:space="preserve" fill="#edf3ff" font-family="monospace" font-size="16">3 commits, 1 file touched, +14 -0</text>
+<text x="24" y="263" xml:space="preserve" fill="#edf3ff" font-family="monospace" font-size="16">Most changed: Documentation/RelNotes/2.98.0.adoc (1)</text>
+</svg>

@@ -1,16 +1,12 @@
 # gittrail
 
+[![CI](https://github.com/Ibom1/gittrail/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/Ibom1/gittrail/actions/workflows/test.yml)
+
 Read a repository's git history and explain how the code got where it is: which commits changed what, which files change most, and the full timeline of a single file, renames included. Runs locally, needs only Python and git, and never changes your repository.
 
-```
-$ gittrail file src/hashing.js
-History of src/hashing.js:
-  2026-11-03  b8219a7  created      +32 -0  Add folder scanner with six checks
-  2026-11-03  e82730b  renamed       +0 -0  Rename hash module  (was src/hash.js)
+![Terminal output showing three commits from the Git source repository](docs/demo.svg)
 
-2 commits
-Known as: src/hash.js -> src/hashing.js
-```
+Demo captured against a checkout of the [Git source repository](https://github.com/git/git).
 
 ## Who it's for
 
@@ -33,6 +29,12 @@ Options: `-C <repo>` to point at another repository, `-n <count>` to limit commi
 | 0 | Success |
 | 2 | git failed, or the folder isn't a git repository |
 | 64 | Wrong usage |
+
+## How it compares
+
+- **`git log`** gives you the underlying history and flexible filters. Gittrail adds a ready-to-read summary and a ranked list of changed files.
+- **tig** lets you browse history interactively in a terminal. Gittrail prints a report you can read, save, or consume as JSON.
+- **git-quick-stats** summarizes repository activity. Gittrail focuses on what changed in the code and follows an individual file across renames.
 
 ## Install and run
 
