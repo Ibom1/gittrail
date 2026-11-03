@@ -8,10 +8,10 @@ Gittrail explains code history using local Git data. It runs offline and reads r
 | v0.2 | Release notes and overview | ✅ released | |
 | v0.3 | Summarize branches | not started | 6–8 h |
 | v0.4 | Flag changes for review | not started | 5–7 h |
-| v0.5 | Find files that change together | not started | |
-| v0.6 | Trace text and line history | not started | |
-| v0.7 | Generate an offline report | not started | |
-| v1.0 | Distribution and scale | not started | |
+| v0.5 | Find files that change together | not started |6–8 h |
+| v0.6 | Trace text and line history | not started |5–7 h |
+| v0.7 | Generate an offline report | not started |6–9 h |
+| v1.0 | Distribution and scale | not started |8–12 h |
 
 ## v0.1 · Read Git history
 
@@ -66,7 +66,8 @@ Gittrail explains code history using local Git data. It runs offline and reads r
 
 ## Distribution and v1.0
 
-- [ ] Start PyPI packaging and name availability checks early. Publish once ownership and release credentials are set up, then verify `pipx install gittrail`.
+- [x] Check PyPI availability. [Another project uses the `gittrail` distribution name](https://pypi.org/project/gittrail/).
+- [ ] Choose and verify a new PyPI distribution name before v1.0. Keep the CLI command `gittrail` and verify installation with `pipx` using the new distribution name.
 - [ ] Run CI on Windows, macOS, and Linux.
 - [ ] Test performance on repositories with at least 50,000 commits and stream Git output where needed.
 - [ ] Continue publishing versioned releases and updating the changelog.

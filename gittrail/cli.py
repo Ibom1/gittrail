@@ -7,11 +7,15 @@ import json
 import os
 import re
 import sys
+import shlex
+import shutil
+import tempfile
 from pathlib import Path
 
 from . import __version__
 from .git import Commit, GitError, read_log
 from .history import FileEvent, file_timeline, summarise
+from .sample import build_sample_repo
 from .reports import changes, markdown_cell, overview, render_report, table
 
 EXIT_OK = 0
@@ -109,6 +113,45 @@ def format_timeline(path: str, events: list[FileEvent]) -> str:
 # ---------- entry point ----------
 
 
+def _show_demo(repo: Path) -> None:
+    print("Building a sample repository (6 commits, 2 folders, 1 rename, 1 deletion)...")
+    build_sample_repo(repo)
+    commits = read_log(repo, rev="HEAD")
+    path = "src/hashing.py"
+    print("\n── Recent history ──")
+    print(format_log(commits, show_files=False))
+    print("\n── Every file each commit touched ──")
+    print(format_log(commits, show_files=True))
+    print("\n── One file's story, across a rename ──")
+    print(format_timeline(path, file_timeline(repo, path)))
+    print("\nThat was a throwaway repository. Try it on your own: gittrail log -C <path-to-a-repo>")
+
+
+def _demo(keep: bool) -> int:
+    if shutil.which("git") is None:
+        print("gittrail demo needs git installed and on PATH", file=sys.stderr)
+        return EXIT_ERROR
+    try:
+        if keep:
+            repo = Path(tempfile.mkdtemp(prefix="gittrail-demo-"))
+            _show_demo(repo)
+            quoted = shlex.quote(str(repo))
+            print(f"\nSample repository kept at {repo}")
+            print(f"  python -m gittrail log -C {quoted}")
+            print(f"  python -m gittrail file src/hashing.py -C {quoted}")
+        else:
+            with tempfile.TemporaryDirectory(prefix="gittrail-demo-") as folder:
+                _show_demo(Path(folder))
+    except FileNotFoundError as exc:
+        message = "gittrail demo needs git installed and on PATH" if exc.filename == "git" else f"gittrail: {exc}"
+        print(message, file=sys.stderr)
+        return EXIT_ERROR
+    except (GitError, OSError) as exc:
+        print(f"gittrail: {exc}", file=sys.stderr)
+        return EXIT_ERROR
+    return EXIT_OK
+
+
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(
         prog="gittrail",
@@ -140,6 +183,8 @@ def build_parser() -> argparse.ArgumentParser:
     fl = sub.add_parser("file", parents=[common], help="show the timeline of one file, following renames")
     fl.add_argument("path", help="file path, relative to the repository")
     fl.add_argument("rev", nargs="?", help="branch, tag or commit to start from (default: HEAD)")
+    demo = sub.add_parser("demo", help="try Gittrail on a sample repository")
+    demo.add_argument("--keep", action="store_true", help="keep the sample directory")
     return p
 
 
@@ -168,6 +213,8 @@ def main(argv: list[str] | None = None) -> int:
         print("gittrail: --limit must be at least 1", file=sys.stderr)
         return EXIT_USAGE
 
+    if args.command == "demo":
+        return _demo(args.keep)
     color = sys.stdout.isatty() and not args.no_color and "NO_COLOR" not in os.environ
 
     def print_text(text):
