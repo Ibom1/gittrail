@@ -6,12 +6,15 @@ Gittrail explains code history using local Git data. It runs offline and reads r
 |---|---|---|---|
 | v0.1 | Read history | ✅ released | |
 | v0.2 | Release notes and overview | ✅ released | |
-| v0.3 | Summarize branches | not started | 6–8 h |
+| v0.3 | Summarize branches | not started | 8–10 h |
 | v0.4 | Flag changes for review | not started | 5–7 h |
-| v0.5 | Find files that change together | not started |6–8 h |
-| v0.6 | Trace text and line history | not started |5–7 h |
-| v0.7 | Generate an offline report | not started |6–9 h |
-| v1.0 | Distribution and scale | not started |8–12 h |
+| v0.5 | Find files that change together | not started | 4–6 h |
+| v0.6 | Trace text and line history | not started | 3–5 h |
+| v0.7 | Generate an offline report | not started | 6–8 h |
+| v1.0 | Distribution and scale | not started | 6–10 h |
+| **Total remaining** | | | **32–46 h** |
+
+Estimates are hands-on development hours for comparing milestone scope. Calendar time depends on how the work is done.
 
 ## v0.1 · Read Git history
 
@@ -39,7 +42,7 @@ Gittrail explains code history using local Git data. It runs offline and reads r
 
 ## v0.4 · Flag changes for review
 
-- [ ] Prioritize this after branch summaries. Flag large changes without accompanying test changes, frequently changed files, churn, and repeated fixes on the same file.
+- [ ] Flag large changes without accompanying test changes, frequently changed files, churn, and repeated fixes on the same file.
 - [ ] Explain what triggered each flag and support configurable thresholds.
 
 **Done when** each review rule flags its triggering fixture and leaves the control fixture clear.
