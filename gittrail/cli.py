@@ -33,7 +33,6 @@ def commit_to_dict(c: Commit) -> dict:
     return {
         "sha": c.sha,
         "short": c.short,
-        "author": c.author,
         "date": c.date,
         "subject": c.subject,
         "added": c.added,

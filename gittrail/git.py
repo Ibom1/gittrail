@@ -14,7 +14,7 @@ from pathlib import Path
 # so they split git's output safely.
 RS = "\x1e"
 US = "\x1f"
-LOG_FORMAT = f"{RS}%H{US}%h{US}%an{US}%aI{US}%s"
+LOG_FORMAT = f"{RS}%H{US}%h{US}%aI{US}%s"
 
 
 class GitError(Exception):
@@ -37,7 +37,6 @@ class FileChange:
 class Commit:
     sha: str
     short: str
-    author: str
     date: str  # ISO 8601, as git gives it
     subject: str
     files: list[FileChange] = field(default_factory=list)
@@ -114,10 +113,10 @@ def parse_log(output: str) -> list[Commit]:
             continue
         header, _, body = record.partition("\n")
         parts = header.split(US)
-        if len(parts) != 5:
+        if len(parts) != 4:
             continue
-        sha, short, author, date, subject = parts
-        commit = Commit(sha, short, author, date, subject)
+        sha, short, date, subject = parts
+        commit = Commit(sha, short, date, subject)
         for line in body.splitlines():
             if not line.strip():
                 continue

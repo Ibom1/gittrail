@@ -34,7 +34,7 @@ class ParseTests(unittest.TestCase):
         self.assertEqual(parse_numstat_path("src/{ => util}/a.py"), ("src/util/a.py", "src/a.py"))
 
     def test_binary_and_subject_with_tabs(self):
-        out = f"{RS}abc{US}ab{US}Ann{US}2026-01-01T00:00:00+00:00{US}fix\tthing\n\n-\t-\tlogo.png\n3\t1\ta.py\n"
+        out = f"{RS}abc{US}ab{US}2026-01-01T00:00:00+00:00{US}fix\tthing\n\n-\t-\tlogo.png\n3\t1\ta.py\n"
         [c] = parse_log(out)
         self.assertEqual(c.subject, "fix\tthing")
         self.assertTrue(c.files[0].binary)
@@ -101,6 +101,8 @@ class LogTests(unittest.TestCase):
         code, out, _ = run_cli("log", "-C", str(self.repo.path), "--json")
         self.assertEqual(code, 0)
         data = json.loads(out)
+        self.assertNotIn("author", data["commits"][0])
+        self.assertNotIn("Test Author", out)
         self.assertEqual(data["version"], 1)
         self.assertEqual(data["commits"][0]["files"][0]["path"], "a.py")
 
