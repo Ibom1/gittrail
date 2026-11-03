@@ -1,6 +1,6 @@
 """Run git and parse its output into plain Python objects.
 
-Only `git log` is used. gittrail never changes a repository.
+Git commands are read-only.
 """
 
 from __future__ import annotations
@@ -143,6 +143,8 @@ def read_log(
     limit: int | None = None,
     path: str | None = None,
     follow: bool = False,
+    since: str | None = None,
+    until: str | None = None,
 ) -> list[Commit]:
     """Commits reachable from `rev` (default HEAD), newest first."""
     ensure_repo(repo)
@@ -153,8 +155,12 @@ def read_log(
         args.append(f"-n{limit}")
     if follow:
         args.append("--follow")
+    if since is not None:
+        args.append(f"--since={since}")
+    if until is not None:
+        args.append(f"--until={until}")
     if rev:
-        args.append(rev)
+        args.extend(["--end-of-options", rev])
     if path:
         args += ["--", path]
     return parse_log(run_git(repo, *args))

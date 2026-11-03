@@ -4,12 +4,15 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
+import re
 import sys
 from pathlib import Path
 
 from . import __version__
 from .git import Commit, GitError, read_log
 from .history import FileEvent, file_timeline, summarise
+from .reports import changes, markdown_cell, overview, render_report, table
 
 EXIT_OK = 0
 EXIT_ERROR = 2
@@ -116,12 +119,23 @@ def build_parser() -> argparse.ArgumentParser:
 
     common = argparse.ArgumentParser(add_help=False)
     common.add_argument("-C", "--repo", default=".", help="repository folder (default: current folder)")
-    common.add_argument("--json", action="store_true", help="print JSON instead of text")
+    formats = common.add_mutually_exclusive_group()
+    formats.add_argument("--json", action="store_true", help="print JSON instead of text")
+    formats.add_argument("--md", action="store_true", help="print Markdown instead of text")
+    common.add_argument("--no-color", action="store_true", help="disable terminal colors")
 
     lg = sub.add_parser("log", parents=[common], help="list commits with the files and lines they changed")
     lg.add_argument("rev", nargs="?", help="branch, tag or commit to start from (default: HEAD)")
     lg.add_argument("-n", "--limit", type=int, help="show at most this many commits")
     lg.add_argument("--files", action="store_true", help="list each commit's changed files")
+
+    lg.add_argument("--since")
+    lg.add_argument("--until")
+
+    ch = sub.add_parser("changes", parents=[common], help="summarize changes between two revisions")
+    ch.add_argument("range", metavar="<from>..<to>")
+    ov = sub.add_parser("overview", parents=[common], help="summarize repository activity")
+    ov.add_argument("--months", type=int, default=12)
 
     fl = sub.add_parser("file", parents=[common], help="show the timeline of one file, following renames")
     fl.add_argument("path", help="file path, relative to the repository")
@@ -131,28 +145,79 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
+    argv = list(sys.argv[1:] if argv is None else argv)
+    path = None
     try:
+        if argv and argv[0] == "log" and "--" in argv:
+            boundary = argv.index("--")
+            paths = argv[boundary + 1:]
+            if len(paths) != 1:
+                parser.error("log -- requires exactly one path")
+            path = paths[0]
+            argv = argv[:boundary]
         args = parser.parse_args(argv)
+        if args.command == "changes":
+            start, separator, end = args.range.partition("..")
+            if not separator or not start or not end or end.startswith(".") or ".." in end:
+                parser.error("changes requires <from>..<to>")
+        if args.command == "overview" and args.months < 1:
+            parser.error("--months must be at least 1")
     except SystemExit as exc:  # argparse exits 2 on bad usage; use 64 like other CLIs
         return EXIT_OK if exc.code == 0 else EXIT_USAGE
     if getattr(args, "limit", None) is not None and args.limit < 1:
         print("gittrail: --limit must be at least 1", file=sys.stderr)
         return EXIT_USAGE
 
+    color = sys.stdout.isatty() and not args.no_color and "NO_COLOR" not in os.environ
+
+    def print_text(text):
+        if color:
+            text = re.sub(r"(?m)^([0-9a-f]{7,})(?=  )", lambda m: f"\x1b[2m{m[0]}\x1b[0m", text)
+            text = re.sub(r"(?m)^(  \d{4}-\d{2}-\d{2}  )([0-9a-f]{7,})", lambda m: f"{m[1]}\x1b[2m{m[2]}\x1b[0m", text)
+            text = re.sub(r"(?m)^.*(?: -> |  renamed ).*$", lambda m: f"\x1b[33m{m[0]}\x1b[0m", text)
+            text = re.sub(r"(?<!\w)([+-])(\d+)\b", lambda m: f"\x1b[{32 if m[1] == '+' else 31}m{m[0]}\x1b[0m", text)
+        print(text)
+
     repo = Path(args.repo)
     try:
         if args.command == "log":
-            commits = read_log(repo, rev=args.rev, limit=args.limit)
+            commits = read_log(repo, rev=args.rev, limit=args.limit, path=path, since=args.since, until=args.until)
             if args.json:
                 print(json.dumps({"version": 1, "commits": [commit_to_dict(c) for c in commits]}, indent=2))
+            elif args.md:
+                rows = [(_day(c.date), c.short, f"{len(c.files)} files", _stat(c.added, c.deleted), c.subject) for c in commits]
+                lines = table(["Date", "Commit", "Change", "+/-", "Message"], rows)
+                summary = summarise(commits)
+                lines.extend(["", f"- {summary.commits} commits, {summary.files_touched} files, {_stat(summary.added, summary.deleted)}"])
+                if args.files:
+                    for c in commits:
+                        for f in c.files:
+                            name = f"{f.old_path} → {f.path}" if f.old_path else f.path
+                            lines.append(f"- {c.short} · {markdown_cell(name)} · {_stat(f.added, f.deleted)}")
+                lines.extend(f"- {markdown_cell(name)} ({count} commits)" for name, count in summary.busiest_files)
+                print("\n".join(lines))
             else:
-                print(format_log(commits, show_files=args.files))
+                print_text(format_log(commits, show_files=args.files))
         elif args.command == "file":
             events = file_timeline(repo, args.path, rev=args.rev)
             if args.json:
                 print(json.dumps({"version": 1, "path": args.path, "events": [event_to_dict(e) for e in events]}, indent=2))
+            elif args.md:
+                rows = [(_day(e.commit.date), e.commit.short,
+                         f"renamed from {e.old_path}" if e.old_path else e.kind,
+                         _stat(e.added, e.deleted), e.commit.subject) for e in events]
+                print("\n".join(table(["Date", "Commit", "Change", "+/-", "Message"], rows)
+                                + ["", f"- {len(events)} commits for {markdown_cell(args.path)}"]))
             else:
-                print(format_timeline(args.path, events))
+                print_text(format_timeline(args.path, events))
+        else:
+            report = changes(repo, *args.range.split("..")) if args.command == "changes" else overview(repo, args.months)
+            if args.json:
+                print(json.dumps({"version": 1, **report}, indent=2))
+            elif args.md:
+                print(render_report(args.command, report, True))
+            else:
+                print_text(render_report(args.command, report, False))
     except GitError as exc:
         print(f"gittrail: {exc}", file=sys.stderr)
         return EXIT_ERROR
