@@ -5,7 +5,7 @@ Gittrail explains code history using local Git data. It runs offline and reads r
 | Version | What | Status | Estimate |
 |---|---|---|---|
 | v0.1 | Read history | ✅ released | |
-| v0.2 | Release notes and overview | CI pending | |
+| v0.2 | Release notes and overview | ✅ released | |
 | v0.3 | Summarize branches | not started | 6–8 h |
 | v0.4 | Flag changes for review | not started | 5–7 h |
 | v0.5 | Find files that change together | not started | |
@@ -25,7 +25,7 @@ Gittrail explains code history using local Git data. It runs offline and reads r
 - [x] Add date and path filters to `log`.
 - [x] Add Markdown reports and terminal color controls.
 - [x] Document examples and troubleshooting.
-- [ ] Publish after CI passes.
+- [x] Publish after CI passes.
 
 **Done when** tagged snapshots report the same added, removed, and renamed files in text, JSON, and Markdown, and dated fixtures verify overview counts and combined filters.
 
