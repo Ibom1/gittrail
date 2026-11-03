@@ -34,6 +34,8 @@ class SampleTests(unittest.TestCase):
         self.assertEqual(code, 0)
         for expected in ("── Recent history ──", "── Every file each commit touched ──",
                          "── One file's story, across a rename ──",
+                         "Changes from v0.1 to v0.2: 3 commits",
+                         "Repository: 6 commits, 2026-01-05 to 2026-01-20",
                          "Known as: src/hash.py -> src/hashing.py"):
             self.assertIn(expected, out)
         self.assertFalse(build.call_args.args[0].exists())

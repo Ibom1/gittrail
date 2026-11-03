@@ -124,7 +124,12 @@ def _show_demo(repo: Path) -> None:
     print(format_log(commits, show_files=True))
     print("\n── One file's story, across a rename ──")
     print(format_timeline(path, file_timeline(repo, path)))
-    print("\nThat was a throwaway repository. Try it on your own: gittrail log -C <path-to-a-repo>")
+    print("\n── What changed between two releases ──")
+    print(render_report("changes", changes(repo, "v0.1", "v0.2"), False))
+    print("\n── The whole repo at a glance ──")
+    print(render_report("overview", overview(repo, 3), False))
+    print("\nThat was a throwaway repository. Try it on your own:")
+    print("  gittrail overview -C <path-to-a-repo>")
 
 
 def _demo(keep: bool) -> int:
